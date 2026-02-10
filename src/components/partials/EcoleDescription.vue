@@ -80,20 +80,45 @@
                         Identification
                       </dt>
                       <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        <div v-if="ecole.numero_bce_de_l_etablissement">
-                          <span class="font-medium">N° BCE:</span>
-                          <a
-                            :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
-                            target="_blank"
-                            class="text-age hover:underline"
-                          >{{ ecole.numero_bce_de_l_etablissement }}</a>
-                        </div>
-                        <div v-if="ecole.ndeg_fase_de_l_etablissement">
-                          <span class="font-medium">N° FASE établissement:</span> {{ ecole.ndeg_fase_de_l_etablissement }}
-                        </div>
-                        <div v-if="ecole.ndeg_fase_de_l_implantation">
-                          <span class="font-medium">N° FASE implantation:</span> {{ ecole.ndeg_fase_de_l_implantation }}
-                        </div>
+                        <dl class="space-y-1">
+                          <div
+                            v-if="ecole.numero_bce_de_l_etablissement"
+                            class="flex items-baseline gap-2"
+                          >
+                            <dt class="font-medium text-gray-500 whitespace-nowrap">
+                              N° BCE
+                            </dt>
+                            <dd>
+                              <a
+                                :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
+                                target="_blank"
+                                class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-age hover:underline select-all"
+                              >{{ ecole.numero_bce_de_l_etablissement }}</a>
+                            </dd>
+                          </div>
+                          <div
+                            v-if="ecole.ndeg_fase_de_l_etablissement"
+                            class="flex items-baseline gap-2"
+                          >
+                            <dt class="font-medium text-gray-500 whitespace-nowrap">
+                              N° FASE établissement
+                            </dt>
+                            <dd class="font-mono bg-gray-100 px-1.5 py-0.5 rounded select-all">
+                              {{ ecole.ndeg_fase_de_l_etablissement }}
+                            </dd>
+                          </div>
+                          <div
+                            v-if="ecole.ndeg_fase_de_l_implantation"
+                            class="flex items-baseline gap-2"
+                          >
+                            <dt class="font-medium text-gray-500 whitespace-nowrap">
+                              N° FASE implantation
+                            </dt>
+                            <dd class="font-mono bg-gray-100 px-1.5 py-0.5 rounded select-all">
+                              {{ ecole.ndeg_fase_de_l_implantation }}
+                            </dd>
+                          </div>
+                        </dl>
                       </dd>
                     </div>
 
