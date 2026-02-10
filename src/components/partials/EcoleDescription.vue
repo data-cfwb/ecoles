@@ -81,7 +81,12 @@
                       </dt>
                       <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                         <div v-if="ecole.numero_bce_de_l_etablissement">
-                          <span class="font-medium">N° BCE:</span> {{ ecole.numero_bce_de_l_etablissement }}
+                          <span class="font-medium">N° BCE:</span>
+                          <a
+                            :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
+                            target="_blank"
+                            class="text-age hover:underline"
+                          >{{ ecole.numero_bce_de_l_etablissement }}</a>
                         </div>
                         <div v-if="ecole.ndeg_fase_de_l_etablissement">
                           <span class="font-medium">N° FASE établissement:</span> {{ ecole.ndeg_fase_de_l_etablissement }}
