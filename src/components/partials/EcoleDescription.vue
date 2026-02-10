@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable vue/no-reserved-component-names -->
   <TransitionRoot
     as="template"
     :show="!!ecole"
@@ -203,6 +204,7 @@ import { MapIcon } from '@heroicons/vue/24/outline';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 
 export default {
+  /* eslint-disable vue/no-reserved-component-names */
   components: {
     Dialog,
     DialogPanel,
@@ -211,6 +213,7 @@ export default {
     MapIcon,
     XMarkIcon,
   },
+  /* eslint-enable vue/no-reserved-component-names */
   props: {
     ecole: {
       type: Object,

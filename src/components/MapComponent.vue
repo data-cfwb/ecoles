@@ -12,11 +12,13 @@ import 'leaflet.markercluster';
 
 // Fix for default marker icon in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
+/* eslint-disable no-undef */
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
+/* eslint-enable no-undef */
 
 export default {
   props: {
@@ -30,6 +32,7 @@ export default {
       default: null,
     },
   },
+  emits: ['selectEcole'],
   data() {
     return {
       map: null,
