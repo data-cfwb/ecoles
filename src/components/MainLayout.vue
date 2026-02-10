@@ -64,7 +64,7 @@ const mobileFiltersOpen = ref(false);
                   </button>
                 </div>
                 <div class="pb-4 pt-4 px-4 text-sm font-bold">
-                  {{ ecoles.length }} écoles trouvées
+                  {{ isRandomView ? '10 écoles au hasard' : ecoles.length + ' écoles trouvées' }}
                 </div>
 
                 <!-- Search by name -->
@@ -107,28 +107,44 @@ const mobileFiltersOpen = ref(false);
                 <div
                   v-for="section in filters"
                   :key="section.name"
-                  as="div"
                   class="border-t border-gray-200 pb-4 pt-4"
                 >
                   <fieldset>
                     <legend class="w-full px-2">
-                      <div class="flex w-full items-center justify-between p-2 text-gray-400 hover:text-gray-500">
-                        <span class="text-sm font-bold text-gray-900 uppercase">{{ section.name }}</span>
-                      </div>
+                      <button
+                        class="flex w-full items-center justify-between p-2 text-gray-400 hover:text-gray-500"
+                        @click="section.collapsed = !section.collapsed"
+                      >
+                        <span class="text-sm font-bold text-gray-900 uppercase">{{ section.name }}
+                          <span
+                            v-if="active_filters[section.id]"
+                            class="text-xs font-normal text-age"
+                          >(1)</span>
+                        </span>
+                        <ChevronDownIcon
+                          v-if="!section.collapsed"
+                          class="h-5 w-5"
+                        />
+                        <ChevronRightIcon
+                          v-else
+                          class="h-5 w-5"
+                        />
+                      </button>
                     </legend>
-                    <div v-if="data_loaded">
-                      <div class="px-4 pb-2">
-                        <div class="space-y-3">
-                          <button
-                            v-for="option in section.options"
-                            :key="option"
-                            class="flex items-center text-left"
-                            :class="active_filters[section.id] === option ? 'font-bold text-age' : ''"
-                            @click="filterCategory(section.id, option)"
-                          >
-                            {{ option }} <span class="text-gray-500 ml-1">({{ getCountCategory(section.id, option) }})</span>
-                          </button>
-                        </div>
+                    <div
+                      v-show="!section.collapsed && data_loaded"
+                      class="px-4 pb-2"
+                    >
+                      <div class="space-y-3">
+                        <button
+                          v-for="option in section.options"
+                          :key="option"
+                          class="flex items-center text-left"
+                          :class="active_filters[section.id] === option ? 'font-bold text-age' : ''"
+                          @click="filterCategory(section.id, option)"
+                        >
+                          {{ option }} <span class="text-gray-500 ml-1">({{ getCountCategory(section.id, option) }})</span>
+                        </button>
                       </div>
                     </div>
                   </fieldset>
@@ -226,15 +242,48 @@ const mobileFiltersOpen = ref(false);
                 </div>
 
                 <div
-                  v-for="(section, sectionIdx) in filters"
+                  v-if="Object.keys(active_filters).length > 0 || search_text || search_postal"
+                  class="pt-4"
+                >
+                  <button
+                    class="w-full rounded-md bg-age px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
+                    @click="resetFilter"
+                  >
+                    Réinitialiser les filtres
+                  </button>
+                </div>
+
+                <div
+                  v-for="section in filters"
                   :key="section.name"
-                  :class="sectionIdx === 0 ? 'pt-6' : 'pt-10'"
+                  class="pt-4"
                 >
                   <fieldset>
-                    <legend class="block text-md leading-6 font-bold text-gray-900 uppercase">
-                      {{ section.name }}
+                    <legend class="w-full">
+                      <button
+                        class="flex w-full items-center justify-between text-md leading-6 font-bold text-gray-900 uppercase hover:text-age"
+                        @click="section.collapsed = !section.collapsed"
+                      >
+                        <span>{{ section.name }}
+                          <span
+                            v-if="active_filters[section.id]"
+                            class="text-xs font-normal text-age"
+                          >(1)</span>
+                        </span>
+                        <ChevronDownIcon
+                          v-if="!section.collapsed"
+                          class="h-5 w-5"
+                        />
+                        <ChevronRightIcon
+                          v-else
+                          class="h-5 w-5"
+                        />
+                      </button>
                     </legend>
-                    <div class="space-y-3 pt-2 max-h-64 overflow-y-auto">
+                    <div
+                      v-show="!section.collapsed"
+                      class="space-y-3 pt-2 max-h-64 overflow-y-auto"
+                    >
                       <button
                         v-for="option in section.options"
                         :key="option"
@@ -248,15 +297,6 @@ const mobileFiltersOpen = ref(false);
                   </fieldset>
                 </div>
 
-                <div class="pt-6">
-                  <button
-                    v-if="Object.keys(active_filters).length > 0 || search_text || search_postal"
-                    class="w-full rounded-md bg-age px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-                    @click="resetFilter"
-                  >
-                    Réinitialiser les filtres
-                  </button>
-                </div>
               </div>
             </aside>
 
@@ -270,7 +310,7 @@ const mobileFiltersOpen = ref(false);
                     <div class="sm:flex sm:items-center">
                       <div class="sm:flex-auto">
                         <p class="text-sm text-gray-700">
-                          {{ ecoles.length }} écoles trouvées
+                          {{ isRandomView ? '10 écoles au hasard' : ecoles.length + ' écoles trouvées' }}
                         </p>
                       </div>
                       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -338,7 +378,7 @@ import MapComponent from '@/components/MapComponent.vue';
 import FooterModule from '@/components/partials/FooterModule.vue';
 import ListEcoles from '@/components/ListEcoles.vue';
 import EcoleDescription from '@/components/partials/EcoleDescription.vue';
-import { MapPinIcon, ListBulletIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+import { MapPinIcon, ListBulletIcon, MagnifyingGlassIcon, ChevronDownIcon, ChevronRightIcon } from '@heroicons/vue/24/outline';
 
 export default {
   components: {
@@ -348,6 +388,8 @@ export default {
     MapPinIcon,
     ListBulletIcon,
     MagnifyingGlassIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
     FooterModule
   },
   data() {
@@ -358,21 +400,25 @@ export default {
           id: 'type_d_enseignement',
           name: 'Type d\'enseignement',
           options: [],
+          collapsed: true,
         },
         {
           id: 'reseau',
           name: 'Réseau',
           options: [],
+          collapsed: true,
         },
         {
           id: 'arrondissement_administratif',
           name: 'Arrondissement',
           options: [],
+          collapsed: true,
         },
         {
           id: 'commune_de_l_etablissement',
           name: 'Commune',
           options: [],
+          collapsed: true,
         }
       ],
       selected_ecole: null,
@@ -384,6 +430,7 @@ export default {
       data_loaded: false,
       seeMap: false,
       filterCounts: {},
+      isRandomView: true,
     };
   },
   computed: {
@@ -450,6 +497,7 @@ export default {
       this.applyFilters();
     },
     applyFilters() {
+      this.isRandomView = false;
       let filtered = [...this.original_ecoles];
 
       // Apply category filters
@@ -488,18 +536,23 @@ export default {
       this.active_filters = {};
       this.search_text = '';
       this.search_postal = '';
-      this.ecoles = [...this.original_ecoles];
-      this.addProperties;
-      this.orderByCommune();
+      this.isRandomView = true;
+      this.ecoles = this.shuffleArray([...this.original_ecoles]).slice(0, 10);
+    },
+    shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     },
     getEcoles() {
       this.data_loaded = false;
       this.original_ecoles = ecolesData;
-      this.ecoles = [...this.original_ecoles];
       this.addProperties;
-      this.orderByCommune();
       this.defineFilters();
-      console.log(`Loaded ${this.ecoles.length} schools`);
+      this.ecoles = this.shuffleArray([...this.original_ecoles]).slice(0, 10);
+      console.log(`Loaded ${this.original_ecoles.length} schools, displaying 10`);
       this.data_loaded = true;
     },
   },
