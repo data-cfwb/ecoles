@@ -2,8 +2,8 @@
   <div>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div
-        v-for="ecole in paginatedEcoles"
-        :key="ecole.ndeg_fase_de_l_etablissement"
+        v-for="(ecole, index) in paginatedEcoles"
+        :key="index"
         class="relative flex flex-col gap-2 rounded-lg border border-gray-300 bg-white px-4 py-4 shadow-sm hover:border-age hover:shadow-md transition-all cursor-pointer"
         @click="emitSelectedEcole(ecole)"
       >

@@ -5,6 +5,8 @@
         <p class="text-left text-xs leading-5 text-gray-500">
           Réalisé sous licence libre. <br>
           <a href="https://github.com/data-cfwb/ecoles">Code source</a><br>
+          Données mises à jour le {{ metadata.last_updated }} —
+          <a href="https://www.odwb.be/explore/dataset/fwb-age-fichier-signaletique-des-etablissements-d-enseignement-de-la-federation-">Source officielle (ODWB)</a>
         </p>
       </div>
 
@@ -31,6 +33,5 @@
 </template>
 
 <script setup>
-
-
+import metadata from '@/data/metadata.json';
 </script>

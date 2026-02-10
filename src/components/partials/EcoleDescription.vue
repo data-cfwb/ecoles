@@ -84,7 +84,10 @@
                           <span class="font-medium">N° BCE:</span> {{ ecole.numero_bce_de_l_etablissement }}
                         </div>
                         <div v-if="ecole.ndeg_fase_de_l_etablissement">
-                          <span class="font-medium">N° FASE:</span> {{ ecole.ndeg_fase_de_l_etablissement }}
+                          <span class="font-medium">N° FASE établissement:</span> {{ ecole.ndeg_fase_de_l_etablissement }}
+                        </div>
+                        <div v-if="ecole.ndeg_fase_de_l_implantation">
+                          <span class="font-medium">N° FASE implantation:</span> {{ ecole.ndeg_fase_de_l_implantation }}
                         </div>
                       </dd>
                     </div>
