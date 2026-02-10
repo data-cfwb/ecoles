@@ -154,7 +154,7 @@ const mobileFiltersOpen = ref(false);
           <!-- logo -->
           <div class="flex items-center justify-center">
             <img
-              src="https://raw.githubusercontent.com/data-cfwb/charte-graphique/main/pastilles_PNG_et_SVG_24px/pastille_Age24.svg"
+              src="https://raw.githubusercontent.com/data-cfwb/charte-graphique/main/pastilles_PNG_et_SVG_24px/pastille_ENS24.svg"
               alt="Fédération Wallonie-Bruxelles"
               width="48"
               class="px-1 sm:px-1"
@@ -480,22 +480,31 @@ export default {
       this.addProperties;
       this.orderByCommune();
     },
-    getEcoles() {
+    async getEcoles() {
       this.data_loaded = false;
-      axios.get('https://www.odwb.be/api/explore/v2.1/catalog/datasets/fwb-age-fichier-signaletique-des-etablissements-d-enseignement-de-la-federation-/records?limit=10000')
-        .then(response => {
-          // Extract records from the response
-          this.original_ecoles = response.data.results || response.data;
-          this.ecoles = [...this.original_ecoles];
-          this.addProperties;
-          this.orderByCommune();
-          this.defineFilters();
-          console.log(`Loaded ${this.ecoles.length} schools`);
-          this.data_loaded = true;
-        })
-        .catch(error => {
-          console.log('Error loading schools:', error);
-        });
+      const baseUrl = 'https://www.odwb.be/api/explore/v2.1/catalog/datasets/fwb-age-fichier-signaletique-des-etablissements-d-enseignement-de-la-federation-/records';
+      const limit = 100;
+      let offset = 0;
+      let allRecords = [];
+      let hasMore = true;
+      try {
+        while (hasMore) {
+          const response = await axios.get(`${baseUrl}?limit=${limit}&offset=${offset}`);
+          const results = response.data.results || [];
+          allRecords = allRecords.concat(results);
+          hasMore = results.length === limit;
+          offset += limit;
+        }
+        this.original_ecoles = allRecords;
+        this.ecoles = [...this.original_ecoles];
+        this.addProperties;
+        this.orderByCommune();
+        this.defineFilters();
+        console.log(`Loaded ${this.ecoles.length} schools`);
+        this.data_loaded = true;
+      } catch (error) {
+        console.log('Error loading schools:', error);
+      }
     },
   },
 };
