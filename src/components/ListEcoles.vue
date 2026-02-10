@@ -1,11 +1,12 @@
 <template>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div
-      v-for="ecole in ecoles"
-      :key="ecole.ndeg_fase_de_l_etablissement"
-      class="relative flex flex-col gap-2 rounded-lg border border-gray-300 bg-white px-4 py-4 shadow-sm hover:border-age hover:shadow-md transition-all cursor-pointer"
-      @click="emitSelectedEcole(ecole)"
-    >
+  <div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        v-for="ecole in paginatedEcoles"
+        :key="ecole.ndeg_fase_de_l_etablissement"
+        class="relative flex flex-col gap-2 rounded-lg border border-gray-300 bg-white px-4 py-4 shadow-sm hover:border-age hover:shadow-md transition-all cursor-pointer"
+        @click="emitSelectedEcole(ecole)"
+      >
       <div class="flex-1">
         <p class="text-lg font-bold leading-6 text-gray-900">
           {{ ecole.nom_d_etablissement || 'École' }}
@@ -48,12 +49,35 @@
         </p>
       </div>
 
-      <div class="flex items-center justify-end pt-2">
-        <ChevronRightIcon
-          class="h-5 w-5 flex-none text-gray-400"
-          aria-hidden="true"
-        />
+        <div class="flex items-center justify-end pt-2">
+          <ChevronRightIcon
+            class="h-5 w-5 flex-none text-gray-400"
+            aria-hidden="true"
+          />
+        </div>
       </div>
+    </div>
+    <div
+      v-if="ecoles.length > pageSize"
+      class="mt-6 flex items-center justify-center gap-4"
+    >
+      <button
+        :disabled="currentPage === 1"
+        class="rounded-md bg-age px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        @click="currentPage--"
+      >
+        Précédent
+      </button>
+      <span class="text-sm text-gray-700">
+        Page {{ currentPage }} / {{ totalPages }}
+      </span>
+      <button
+        :disabled="currentPage >= totalPages"
+        class="rounded-md bg-age px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        @click="currentPage++"
+      >
+        Suivant
+      </button>
     </div>
   </div>
 </template>
@@ -72,6 +96,26 @@ export default {
     },
   },
   emits: ['selectEcole'],
+  data() {
+    return {
+      currentPage: 1,
+      pageSize: 60,
+    };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.ecoles.length / this.pageSize);
+    },
+    paginatedEcoles() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.ecoles.slice(start, start + this.pageSize);
+    },
+  },
+  watch: {
+    ecoles() {
+      this.currentPage = 1;
+    },
+  },
   methods: {
     emitSelectedEcole(ecole) {
       this.$emit('selectEcole', ecole);

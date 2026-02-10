@@ -383,6 +383,7 @@ export default {
       search_postal: '',
       data_loaded: false,
       seeMap: false,
+      filterCounts: {},
     };
   },
   computed: {
@@ -415,13 +416,24 @@ export default {
       console.log(ecole);
     },
     getCountCategory(category, item) {
-      return this.original_ecoles.filter(ecole => ecole[category] === item).length;
+      const counts = this.filterCounts[category];
+      return counts ? (counts[item] || 0) : 0;
     },
     defineFilters() {
+      const counts = {};
       for (let i = 0; i < this.filters.length; i++) {
-        const uniqueValues = [...new Set(this.original_ecoles.map(ecole => ecole[this.filters[i].id]))].filter(val => val && val.trim());
-        this.filters[i].options = uniqueValues.sort();
+        const id = this.filters[i].id;
+        const valueCounts = {};
+        this.original_ecoles.forEach(ecole => {
+          const val = ecole[id];
+          if (val && val.trim()) {
+            valueCounts[val] = (valueCounts[val] || 0) + 1;
+          }
+        });
+        counts[id] = valueCounts;
+        this.filters[i].options = Object.keys(valueCounts).sort();
       }
+      this.filterCounts = counts;
     },
     filterCategory(category, value) {
       if (this.active_filters[category] === value) {
