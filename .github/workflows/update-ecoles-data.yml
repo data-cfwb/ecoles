@@ -1,0 +1,54 @@
+name: Update school data
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 6:00 UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch school data
+        run: |
+          python3 -c "
+          import urllib.request, json
+
+          base_url = 'https://www.odwb.be/api/explore/v2.1/catalog/datasets/fwb-age-fichier-signaletique-des-etablissements-d-enseignement-de-la-federation-/records'
+          limit = 100
+          offset = 0
+          all_records = []
+
+          while True:
+              url = f'{base_url}?limit={limit}&offset={offset}'
+              with urllib.request.urlopen(url) as resp:
+                  data = json.loads(resp.read())
+              results = data.get('results', [])
+              if not results:
+                  break
+              all_records.extend(results)
+              if len(results) < limit:
+                  break
+              offset += limit
+
+          print(f'Total: {len(all_records)} records')
+
+          with open('src/data/ecoles.json', 'w', encoding='utf-8') as f:
+              json.dump(all_records, f, ensure_ascii=False)
+          "
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/ecoles.json
+          git diff --staged --quiet || git commit -m "chore: update school data" && git push
