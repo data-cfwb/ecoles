@@ -333,7 +333,7 @@ const mobileFiltersOpen = ref(false);
 </template>
 
 <script>
-import axios from 'axios';
+import ecolesData from '@/data/ecoles.json';
 import MapComponent from '@/components/MapComponent.vue';
 import FooterModule from '@/components/partials/FooterModule.vue';
 import ListEcoles from '@/components/ListEcoles.vue';
@@ -480,31 +480,15 @@ export default {
       this.addProperties;
       this.orderByCommune();
     },
-    async getEcoles() {
+    getEcoles() {
       this.data_loaded = false;
-      const baseUrl = 'https://www.odwb.be/api/explore/v2.1/catalog/datasets/fwb-age-fichier-signaletique-des-etablissements-d-enseignement-de-la-federation-/records';
-      const limit = 100;
-      let offset = 0;
-      let allRecords = [];
-      let hasMore = true;
-      try {
-        while (hasMore) {
-          const response = await axios.get(`${baseUrl}?limit=${limit}&offset=${offset}`);
-          const results = response.data.results || [];
-          allRecords = allRecords.concat(results);
-          hasMore = results.length === limit;
-          offset += limit;
-        }
-        this.original_ecoles = allRecords;
-        this.ecoles = [...this.original_ecoles];
-        this.addProperties;
-        this.orderByCommune();
-        this.defineFilters();
-        console.log(`Loaded ${this.ecoles.length} schools`);
-        this.data_loaded = true;
-      } catch (error) {
-        console.log('Error loading schools:', error);
-      }
+      this.original_ecoles = ecolesData;
+      this.ecoles = [...this.original_ecoles];
+      this.addProperties;
+      this.orderByCommune();
+      this.defineFilters();
+      console.log(`Loaded ${this.ecoles.length} schools`);
+      this.data_loaded = true;
     },
   },
 };
