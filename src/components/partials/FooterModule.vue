@@ -21,7 +21,7 @@
       </div>
       <div class="flex justify-center space-x-6 md:order-3">
         <p class="text-center text-xs leading-5 text-gray-500">
-          2024 - {{ new Date().getFullYear() }}
+          2026 - {{ new Date().getFullYear() }}
         </p>
         <img
           src="https://raw.githubusercontent.com/data-cfwb/charte-graphique/main/pastilles_SVG/logo_FWB_coul.svg"
