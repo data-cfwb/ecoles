@@ -296,7 +296,6 @@ const mobileFiltersOpen = ref(false);
                     </div>
                   </fieldset>
                 </div>
-
               </div>
             </aside>
 

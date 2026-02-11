@@ -8,17 +8,6 @@
 
 <script>
 import L from 'leaflet';
-import 'leaflet.markercluster';
-
-// Fix for default marker icon in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-/* eslint-disable no-undef */
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
-/* eslint-enable no-undef */
 
 const typeColors = {
   'Maternel': '#85C38E',
@@ -57,7 +46,7 @@ export default {
   data() {
     return {
       map: null,
-      markers: null,
+      markerLayer: null,
       legend: null,
     };
   },
@@ -70,7 +59,7 @@ export default {
     },
     selectedEcole: {
       handler(newVal) {
-        if (newVal && newVal.latitude && newVal.longitude) {
+        if (this.map && newVal && newVal.latitude && newVal.longitude) {
           this.map.setView([newVal.latitude, newVal.longitude], 15);
         }
       },
@@ -88,17 +77,15 @@ export default {
   },
   methods: {
     initMap() {
-      // Initialize map centered on Belgium
       this.map = L.map('map', {
-        attributionControl: false
+        attributionControl: false,
+        preferCanvas: true,
       }).setView([50.5039, 4.4699], 8);
 
-      // Add tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
       }).addTo(this.map);
 
-      // Add attribution control
       L.control.attribution({
         position: 'bottomleft',
         prefix: 'OSM'
@@ -107,34 +94,48 @@ export default {
     updateMarkers() {
       if (!this.map) return;
 
-      // Remove existing marker cluster group
-      if (this.markers) {
-        this.map.removeLayer(this.markers);
+      if (this.markerLayer) {
+        this.map.removeLayer(this.markerLayer);
       }
 
-      // Create new marker cluster group
-      this.markers = L.markerClusterGroup({
-        chunkedLoading: true,
-        maxClusterRadius: 80,
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
-      });
+      this.markerLayer = L.layerGroup();
+      const bounds = L.latLngBounds();
 
-      // Add markers for each school with valid coordinates
+      // Group schools by coordinates to handle overlaps
+      const coordMap = {};
       this.ecoles.forEach(ecole => {
         if (ecole.latitude && ecole.longitude) {
+          const key = `${ecole.latitude},${ecole.longitude}`;
+          if (!coordMap[key]) coordMap[key] = [];
+          coordMap[key].push(ecole);
+        }
+      });
+
+      const offset = 0.00007; // ~7m spread for overlapping points
+      Object.values(coordMap).forEach(group => {
+        group.forEach((ecole, i) => {
+          let lat = parseFloat(ecole.latitude);
+          let lng = parseFloat(ecole.longitude);
+
+          if (group.length > 1) {
+            const angle = (2 * Math.PI * i) / group.length;
+            lat += offset * Math.cos(angle);
+            lng += offset * Math.sin(angle);
+          }
+
           const color = getMarkerColor(ecole.type_d_enseignement);
-          const marker = L.circleMarker([ecole.latitude, ecole.longitude], {
-            radius: 7,
+          const latlng = [lat, lng];
+          bounds.extend(latlng);
+
+          const marker = L.circleMarker(latlng, {
+            radius: 8,
             fillColor: color,
             color: '#fff',
             weight: 2,
             opacity: 1,
-            fillOpacity: 0.85,
+            fillOpacity: 0.9,
           });
 
-          // Create tooltip content
           const tooltipContent = `
             <div class="font-sans">
               <div class="font-bold text-blue-900">${ecole.nom_d_etablissement || 'École'}</div>
@@ -148,17 +149,15 @@ export default {
             offset: [0, -10]
           });
 
-          // On click, emit event to parent
           marker.on('click', () => {
             this.$emit('selectEcole', ecole);
           });
 
-          this.markers.addLayer(marker);
-        }
+          this.markerLayer.addLayer(marker);
+        });
       });
 
-      // Add cluster group to map
-      this.map.addLayer(this.markers);
+      this.markerLayer.addTo(this.map);
 
       // Add legend
       if (!this.legend) {
@@ -183,9 +182,8 @@ export default {
         this.legend.addTo(this.map);
       }
 
-      // Fit bounds to show all markers if there are any
-      if (this.markers.getLayers().length > 0 && !this.selectedEcole) {
-        this.map.fitBounds(this.markers.getBounds(), {
+      if (bounds.isValid() && !this.selectedEcole) {
+        this.map.fitBounds(bounds, {
           padding: [50, 50],
           maxZoom: 12
         });
@@ -196,42 +194,8 @@ export default {
 </script>
 
 <style>
-/* MarkerCluster styling */
-.marker-cluster-small {
-  background-color: rgba(58, 151, 201, 0.6);
-}
-.marker-cluster-small div {
-  background-color: rgba(58, 151, 201, 0.8);
-}
-
-.marker-cluster-medium {
-  background-color: rgba(58, 151, 201, 0.6);
-}
-.marker-cluster-medium div {
-  background-color: rgba(58, 151, 201, 0.8);
-}
-
-.marker-cluster-large {
-  background-color: rgba(58, 151, 201, 0.6);
-}
-.marker-cluster-large div {
-  background-color: rgba(58, 151, 201, 0.8);
-}
-
-.marker-cluster {
-  background-clip: padding-box;
-  border-radius: 20px;
-}
-.marker-cluster div {
-  width: 30px;
-  height: 30px;
-  margin-left: 5px;
-  margin-top: 5px;
-  text-align: center;
-  border-radius: 15px;
-  font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  line-height: 30px;
-  color: white;
+.ecole-marker {
+  background: none !important;
+  border: none !important;
 }
 </style>
