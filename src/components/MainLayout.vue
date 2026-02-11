@@ -342,7 +342,7 @@ const mobileFiltersOpen = ref(false);
                             class="overflow-hidden border-t border-gray-200 sm:rounded-lg"
                           >
                             <MapComponent
-                              :ecoles="ecoles"
+                              :ecoles="allEcolesForMap"
                               :selected-ecole="selected_ecole"
                               @select-ecole="selectEcole"
                             />
@@ -434,6 +434,9 @@ export default {
     };
   },
   computed: {
+    allEcolesForMap() {
+      return this.isRandomView ? this.original_ecoles : this.ecoles;
+    },
     addProperties() {
       return this.ecoles.map(ecole => {
         ecole.latLong = [parseFloat(ecole.latitude), parseFloat(ecole.longitude)];

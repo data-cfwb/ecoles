@@ -20,6 +20,27 @@ L.Icon.Default.mergeOptions({
 });
 /* eslint-enable no-undef */
 
+const typeColors = {
+  'Maternel': '#85C38E',
+  'Primaire': '#3A97C9',
+  'Secondaire': '#BE80B6',
+  'Supérieur': '#ED9E41',
+  'Haute École': '#ED9E41',
+  'Université': '#ED9E41',
+  'Arts': '#E37276',
+  'Artistique': '#E37276',
+  'Adultes': '#42A09E',
+};
+const defaultColor = '#4A5563';
+
+function getMarkerColor(type) {
+  if (!type) return defaultColor;
+  for (const [key, color] of Object.entries(typeColors)) {
+    if (type.includes(key)) return color;
+  }
+  return defaultColor;
+}
+
 export default {
   props: {
     ecoles: {
@@ -37,6 +58,7 @@ export default {
     return {
       map: null,
       markers: null,
+      legend: null,
     };
   },
   watch: {
@@ -102,7 +124,15 @@ export default {
       // Add markers for each school with valid coordinates
       this.ecoles.forEach(ecole => {
         if (ecole.latitude && ecole.longitude) {
-          const marker = L.marker([ecole.latitude, ecole.longitude]);
+          const color = getMarkerColor(ecole.type_d_enseignement);
+          const marker = L.circleMarker([ecole.latitude, ecole.longitude], {
+            radius: 7,
+            fillColor: color,
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85,
+          });
 
           // Create tooltip content
           const tooltipContent = `
@@ -129,6 +159,29 @@ export default {
 
       // Add cluster group to map
       this.map.addLayer(this.markers);
+
+      // Add legend
+      if (!this.legend) {
+        this.legend = L.control({ position: 'bottomright' });
+        this.legend.onAdd = function () {
+          const div = L.DomUtil.create('div', 'leaflet-legend');
+          div.style.cssText = 'background:white;padding:8px 12px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.3);font:12px sans-serif;line-height:20px;';
+          const items = [
+            { label: 'Maternel', color: '#85C38E' },
+            { label: 'Primaire', color: '#3A97C9' },
+            { label: 'Secondaire', color: '#BE80B6' },
+            { label: 'Supérieur / Univ.', color: '#ED9E41' },
+            { label: 'Artistique', color: '#E37276' },
+            { label: 'Adultes', color: '#42A09E' },
+            { label: 'Autre', color: '#4A5563' },
+          ];
+          div.innerHTML = items.map(i =>
+            `<div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${i.color};margin-right:6px;vertical-align:middle;"></span>${i.label}</div>`
+          ).join('');
+          return div;
+        };
+        this.legend.addTo(this.map);
+      }
 
       // Fit bounds to show all markers if there are any
       if (this.markers.getLayers().length > 0 && !this.selectedEcole) {
