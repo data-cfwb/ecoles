@@ -394,6 +394,7 @@ export default {
   data() {
     return {
       title: 'Les écoles en FWB',
+      searchDebounceTimer: null,
       filters: [
         {
           id: 'type_d_enseignement',
@@ -436,25 +437,6 @@ export default {
     allEcolesForMap() {
       return this.isRandomView ? this.original_ecoles : this.ecoles;
     },
-    addProperties() {
-      return this.ecoles.map(ecole => {
-        ecole.latLong = [parseFloat(ecole.latitude), parseFloat(ecole.longitude)];
-        ecole.fullAddress = `${ecole.adresse_de_l_etablissement || ''}, ${ecole.code_postal_de_l_etablissement || ''} ${ecole.localite_de_l_etablissement || ''}`.trim();
-
-        // Clean text fields
-        if (ecole.nom_d_etablissement) {
-          ecole.nom_d_etablissement = ecole.nom_d_etablissement.replace(/\n/g, ' ').trim();
-        }
-        if (ecole.commune_de_l_etablissement) {
-          ecole.commune_de_l_etablissement = ecole.commune_de_l_etablissement.replace(/\n/g, ' ').trim();
-        }
-        if (ecole.localite_de_l_etablissement) {
-          ecole.localite_de_l_etablissement = ecole.localite_de_l_etablissement.replace(/\n/g, ' ').trim();
-        }
-
-        return ecole;
-      });
-    },
   },
   created() {
     this.getEcoles();
@@ -462,7 +444,6 @@ export default {
   methods: {
     selectEcole(ecole) {
       this.selected_ecole = ecole;
-      console.log(ecole);
     },
     getCountCategory(category, item) {
       const counts = this.filterCounts[category];
@@ -493,10 +474,18 @@ export default {
       this.applyFilters();
     },
     searchByName() {
-      this.applyFilters();
+      if (this.search_text && this.search_text.length < 3) return;
+      this.debouncedApplyFilters();
     },
     searchByPostalCode() {
-      this.applyFilters();
+      if (this.search_postal && this.search_postal.toString().length < 2) return;
+      this.debouncedApplyFilters();
+    },
+    debouncedApplyFilters() {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = setTimeout(() => {
+        this.applyFilters();
+      }, 300);
     },
     applyFilters() {
       this.isRandomView = false;
@@ -524,7 +513,6 @@ export default {
       }
 
       this.ecoles = filtered;
-      this.addProperties;
       this.orderByCommune();
     },
     orderByCommune() {
@@ -548,13 +536,27 @@ export default {
       }
       return array;
     },
+    prepareProperties(ecoles) {
+      ecoles.forEach(ecole => {
+        ecole.latLong = [parseFloat(ecole.latitude), parseFloat(ecole.longitude)];
+        ecole.fullAddress = `${ecole.adresse_de_l_etablissement || ''}, ${ecole.code_postal_de_l_etablissement || ''} ${ecole.localite_de_l_etablissement || ''}`.trim();
+        if (ecole.nom_d_etablissement) {
+          ecole.nom_d_etablissement = ecole.nom_d_etablissement.replace(/\n/g, ' ').trim();
+        }
+        if (ecole.commune_de_l_etablissement) {
+          ecole.commune_de_l_etablissement = ecole.commune_de_l_etablissement.replace(/\n/g, ' ').trim();
+        }
+        if (ecole.localite_de_l_etablissement) {
+          ecole.localite_de_l_etablissement = ecole.localite_de_l_etablissement.replace(/\n/g, ' ').trim();
+        }
+      });
+    },
     getEcoles() {
       this.data_loaded = false;
       this.original_ecoles = ecolesData;
-      this.addProperties;
+      this.prepareProperties(this.original_ecoles);
       this.defineFilters();
       this.ecoles = this.shuffleArray([...this.original_ecoles]).slice(0, 10);
-      console.log(`Loaded ${this.original_ecoles.length} schools, displaying 10`);
       this.data_loaded = true;
     },
   },

@@ -55,7 +55,6 @@ export default {
       handler() {
         this.updateMarkers();
       },
-      deep: true,
     },
     selectedEcole: {
       handler(newVal) {
