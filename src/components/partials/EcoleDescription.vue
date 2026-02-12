@@ -73,130 +73,110 @@
                   </div>
                 </div>
                 <div class="border-t border-gray-200">
-                  <dl class="divide-y divide-gray-100">
-                    <!-- Identity Section -->
-                    <div class="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt class="text-sm font-bold leading-6 text-gray-900">
-                        Identification
+                  <!-- Address -->
+                  <div
+                    v-if="ecole.adresse_de_l_etablissement || ecole.code_postal_de_l_etablissement"
+                    class="px-4 py-4 sm:px-6 flex items-start gap-3"
+                  >
+                    <MapPinIcon class="h-5 w-5 text-gray-400 mt-0.5 shrink-0" />
+                    <div class="text-sm text-gray-700">
+                      <div v-if="ecole.adresse_de_l_etablissement">
+                        {{ ecole.adresse_de_l_etablissement }}
+                      </div>
+                      <div v-if="ecole.code_postal_de_l_etablissement || ecole.localite_de_l_etablissement">
+                        {{ ecole.code_postal_de_l_etablissement }} {{ ecole.localite_de_l_etablissement }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Info grid -->
+                  <div class="px-4 sm:px-6 pb-4 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+                    <div v-if="ecole.commune_de_l_etablissement">
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
+                        Commune
                       </dt>
-                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        <dl class="space-y-1">
-                          <div
-                            v-if="ecole.numero_bce_de_l_etablissement"
-                            class="flex items-baseline gap-2"
-                          >
-                            <dt class="font-medium text-gray-500 whitespace-nowrap">
-                              N° BCE
-                            </dt>
-                            <dd>
-                              <a
-                                :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
-                                target="_blank"
-                                class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-age hover:underline select-all"
-                              >{{ ecole.numero_bce_de_l_etablissement }}</a>
-                            </dd>
-                          </div>
-                          <div
-                            v-if="ecole.ndeg_fase_de_l_etablissement"
-                            class="flex items-baseline gap-2"
-                          >
-                            <dt class="font-medium text-gray-500 whitespace-nowrap">
-                              N° FASE établissement
-                            </dt>
-                            <dd class="font-mono bg-gray-100 px-1.5 py-0.5 rounded select-all">
-                              {{ ecole.ndeg_fase_de_l_etablissement }}
-                            </dd>
-                          </div>
-                          <div
-                            v-if="ecole.ndeg_fase_de_l_implantation"
-                            class="flex items-baseline gap-2"
-                          >
-                            <dt class="font-medium text-gray-500 whitespace-nowrap">
-                              N° FASE implantation
-                            </dt>
-                            <dd class="font-mono bg-gray-100 px-1.5 py-0.5 rounded select-all">
-                              {{ ecole.ndeg_fase_de_l_implantation }}
-                            </dd>
-                          </div>
-                        </dl>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.commune_de_l_etablissement }}
                       </dd>
                     </div>
-
-                    <!-- Location Section -->
-                    <div class="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt class="text-sm font-bold leading-6 text-gray-900">
-                        Localisation
+                    <div v-if="ecole.arrondissement_administratif">
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
+                        Arrondissement
                       </dt>
-                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        <div v-if="ecole.adresse_de_l_etablissement">
-                          {{ ecole.adresse_de_l_etablissement }}
-                        </div>
-                        <div v-if="ecole.code_postal_de_l_etablissement || ecole.localite_de_l_etablissement">
-                          {{ ecole.code_postal_de_l_etablissement }} {{ ecole.localite_de_l_etablissement }}
-                        </div>
-                        <div
-                          v-if="ecole.commune_de_l_etablissement"
-                          class="mt-1"
-                        >
-                          <span class="font-medium">Commune:</span> {{ ecole.commune_de_l_etablissement }}
-                        </div>
-                        <div
-                          v-if="ecole.arrondissement_administratif"
-                          class="mt-1"
-                        >
-                          <span class="font-medium">Arrondissement:</span> {{ ecole.arrondissement_administratif }}
-                        </div>
-                        <div
-                          v-if="ecole.bassin"
-                          class="mt-1"
-                        >
-                          <span class="font-medium">Bassin:</span> {{ ecole.bassin }}
-                        </div>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.arrondissement_administratif }}
                       </dd>
                     </div>
-
-                    <!-- Education Section -->
-                    <div class="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt class="text-sm font-bold leading-6 text-gray-900">
-                        Enseignement
+                    <div v-if="ecole.bassin">
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
+                        Bassin
                       </dt>
-                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        <div v-if="ecole.type_d_enseignement">
-                          <span class="font-medium">Type:</span> {{ ecole.type_d_enseignement }}
-                        </div>
-                        <div
-                          v-if="ecole.niveau"
-                          class="mt-1"
-                        >
-                          <span class="font-medium">Niveau:</span> {{ ecole.niveau }}
-                        </div>
-                        <div
-                          v-if="ecole.genre"
-                          class="mt-1"
-                        >
-                          <span class="font-medium">Genre:</span> {{ ecole.genre }}
-                        </div>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.bassin }}
                       </dd>
                     </div>
-
-                    <!-- Network Section -->
-                    <div class="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt class="text-sm font-bold leading-6 text-gray-900">
+                    <div v-if="ecole.type_d_enseignement">
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
+                        Type
+                      </dt>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.type_d_enseignement }}
+                      </dd>
+                    </div>
+                    <div v-if="ecole.niveau">
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
+                        Niveau
+                      </dt>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.niveau }}
+                      </dd>
+                    </div>
+                    <div v-if="ecole.genre">
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
+                        Genre
+                      </dt>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.genre }}
+                      </dd>
+                    </div>
+                    <div v-if="ecole.reseau">
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
                         Réseau
                       </dt>
-                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        <div v-if="ecole.reseau">
-                          {{ ecole.reseau }}
-                        </div>
-                        <div
-                          v-if="ecole.nom_du_po"
-                          class="mt-1"
-                        >
-                          <span class="font-medium">Pouvoir organisateur:</span> {{ ecole.nom_du_po }}
-                        </div>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.reseau }}
                       </dd>
                     </div>
-                  </dl>
+                    <div
+                      v-if="ecole.nom_du_po"
+                      class="col-span-2"
+                    >
+                      <dt class="text-xs font-medium text-gray-500 uppercase">
+                        Pouvoir organisateur
+                      </dt>
+                      <dd class="mt-0.5 text-sm text-gray-900">
+                        {{ ecole.nom_du_po }}
+                      </dd>
+                    </div>
+                  </div>
+
+                  <!-- Technical identifiers -->
+                  <div class="px-4 sm:px-6 py-3 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-500">
+                    <span v-if="ecole.ndeg_fase_de_l_etablissement">
+                      FASE etab. <span class="font-mono select-all">{{ ecole.ndeg_fase_de_l_etablissement }}</span>
+                    </span>
+                    <span v-if="ecole.ndeg_fase_de_l_implantation">
+                      FASE impl. <span class="font-mono select-all">{{ ecole.ndeg_fase_de_l_implantation }}</span>
+                    </span>
+                    <a
+                      v-if="ecole.numero_bce_de_l_etablissement"
+                      :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
+                      target="_blank"
+                      class="hover:text-age hover:underline"
+                    >
+                      BCE <span class="font-mono select-all">{{ ecole.numero_bce_de_l_etablissement }}</span>
+                    </a>
+                  </div>
 
                   <!-- Action buttons -->
                   <div class="px-4 py-4 sm:px-6 bg-gray-50 flex gap-3">
@@ -213,6 +193,17 @@
                       />
                       Voir sur Google Maps
                     </a>
+                    <button
+                      type="button"
+                      class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      @click="shareLink"
+                    >
+                      <ShareIcon
+                        class="h-5 w-5 mr-2"
+                        aria-hidden="true"
+                      />
+                      {{ linkCopied ? 'Lien copié !' : 'Partager' }}
+                    </button>
                     <button
                       type="button"
                       class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
@@ -233,7 +224,7 @@
 
 <script>
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { MapIcon } from '@heroicons/vue/24/outline';
+import { MapIcon, MapPinIcon, ShareIcon } from '@heroicons/vue/24/outline';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 
 export default {
@@ -244,6 +235,8 @@ export default {
     TransitionChild,
     TransitionRoot,
     MapIcon,
+    MapPinIcon,
+    ShareIcon,
     XMarkIcon,
   },
   /* eslint-enable vue/no-reserved-component-names */
@@ -255,7 +248,20 @@ export default {
     },
   },
   emits: ['close'],
+  data() {
+    return {
+      linkCopied: false,
+    };
+  },
   methods: {
+    shareLink() {
+      const url = new URL(window.location);
+      url.searchParams.set('etablissement', this.ecole.ndeg_fase_de_l_etablissement);
+      url.searchParams.set('implantation', this.ecole.ndeg_fase_de_l_implantation);
+      navigator.clipboard.writeText(url.toString());
+      this.linkCopied = true;
+      setTimeout(() => { this.linkCopied = false; }, 2000);
+    },
     getEducationTypeClass(type) {
       const typeMap = {
         'Maternel': 'bg-agaj/10 text-agaj ring-agaj/20',

@@ -1,8 +1,7 @@
 <template>
   <div
     id="map"
-    style="height: 600px; width: 100%"
-    class="z-30"
+    class="z-30 h-[50vh] sm:h-[60vh] lg:h-[600px] w-full"
   />
 </template>
 
