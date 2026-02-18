@@ -73,12 +73,11 @@
                   </div>
                 </div>
                 <div class="border-t border-gray-200">
-                  <!-- Implantation Address -->
+                  <!-- Implantation Address + Technical identifiers -->
                   <div
                     v-if="ecole.adresse_de_l_implantation || ecole.code_postal_de_l_implantation"
-                    class="px-4 py-4 sm:px-6 flex items-start gap-3"
+                    class="px-4 py-4 sm:px-6 flex items-start justify-between gap-6"
                   >
-                    <MapPinIcon class="h-5 w-5 text-gray-400 mt-0.5 shrink-0" />
                     <div class="text-sm text-gray-700">
                       <div class="text-xs font-medium text-gray-500 uppercase mb-1">
                         Adresse de l'implantation
@@ -96,14 +95,41 @@
                         ({{ ecole.commune_de_l_implantation }})
                       </div>
                     </div>
+                    <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs shrink-0">
+                      <span
+                        v-if="ecole.ndeg_fase_de_l_etablissement"
+                        class="text-gray-400"
+                      >FASE étab.</span>
+                      <span
+                        v-if="ecole.ndeg_fase_de_l_etablissement"
+                        class="font-mono select-all text-gray-500"
+                      >{{ ecole.ndeg_fase_de_l_etablissement }}</span>
+                      <span
+                        v-if="ecole.ndeg_fase_de_l_implantation"
+                        class="text-gray-400"
+                      >FASE impl.</span>
+                      <span
+                        v-if="ecole.ndeg_fase_de_l_implantation"
+                        class="font-mono select-all text-gray-500"
+                      >{{ ecole.ndeg_fase_de_l_implantation }}</span>
+                      <span
+                        v-if="ecole.numero_bce_de_l_etablissement"
+                        class="text-gray-400"
+                      >BCE</span>
+                      <a
+                        v-if="ecole.numero_bce_de_l_etablissement"
+                        :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
+                        target="_blank"
+                        class="font-mono select-all text-blue-600 hover:underline"
+                      >{{ ecole.numero_bce_de_l_etablissement }} ↗</a>
+                    </div>
                   </div>
 
                   <!-- Etablissement Address (if different from implantation) -->
                   <div
                     v-if="(ecole.adresse_de_l_etablissement || ecole.code_postal_de_l_etablissement) && (ecole.adresse_de_l_etablissement !== ecole.adresse_de_l_implantation || ecole.code_postal_de_l_etablissement !== ecole.code_postal_de_l_implantation)"
-                    class="px-4 pb-4 sm:px-6 flex items-start gap-3"
+                    class="px-4 pb-4 sm:px-6"
                   >
-                    <BuildingOfficeIcon class="h-5 w-5 text-gray-400 mt-0.5 shrink-0" />
                     <div class="text-sm text-gray-700">
                       <div class="text-xs font-medium text-gray-500 uppercase mb-1">
                         Adresse de l'établissement
@@ -137,8 +163,13 @@
                       <dt class="text-xs font-medium text-gray-500 uppercase">
                         Arrondissement
                       </dt>
-                      <dd class="mt-0.5 text-sm text-gray-900">
-                        {{ ecole.arrondissement_administratif }}
+                      <dd class="mt-0.5 text-sm">
+                        <button
+                          class="text-gray-900 hover:text-age hover:underline text-left"
+                          @click="$emit('filter', 'arrondissement_administratif', ecole.arrondissement_administratif)"
+                        >
+                          {{ ecole.arrondissement_administratif }}
+                        </button>
                       </dd>
                     </div>
                     <div v-if="ecole.bassin">
@@ -153,8 +184,13 @@
                       <dt class="text-xs font-medium text-gray-500 uppercase">
                         Type
                       </dt>
-                      <dd class="mt-0.5 text-sm text-gray-900">
-                        {{ ecole.type_d_enseignement }}
+                      <dd class="mt-0.5 text-sm">
+                        <button
+                          class="text-gray-900 hover:text-age hover:underline text-left"
+                          @click="$emit('filter', 'type_d_enseignement', ecole.type_d_enseignement)"
+                        >
+                          {{ ecole.type_d_enseignement }}
+                        </button>
                       </dd>
                     </div>
                     <div v-if="ecole.niveau">
@@ -177,8 +213,13 @@
                       <dt class="text-xs font-medium text-gray-500 uppercase">
                         Réseau
                       </dt>
-                      <dd class="mt-0.5 text-sm text-gray-900">
-                        {{ ecole.reseau }}
+                      <dd class="mt-0.5 text-sm">
+                        <button
+                          class="text-gray-900 hover:text-age hover:underline text-left"
+                          @click="$emit('filter', 'reseau', ecole.reseau)"
+                        >
+                          {{ ecole.reseau }}
+                        </button>
                       </dd>
                     </div>
                   </div>
@@ -211,38 +252,27 @@
                     </div>
                     <div
                       v-if="ecole.ndeg_fase_du_po || ecole.numero_bce_du_po"
-                      class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500"
+                      class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-xs max-w-xs"
                     >
-                      <span v-if="ecole.ndeg_fase_du_po">
-                        FASE PO <span class="font-mono select-all">{{ ecole.ndeg_fase_du_po }}</span>
-                      </span>
+                      <span
+                        v-if="ecole.ndeg_fase_du_po"
+                        class="text-gray-500"
+                      >FASE</span>
+                      <span
+                        v-if="ecole.ndeg_fase_du_po"
+                        class="font-mono select-all text-gray-700"
+                      >{{ ecole.ndeg_fase_du_po }}</span>
+                      <span
+                        v-if="ecole.numero_bce_du_po"
+                        class="text-gray-500"
+                      >BCE</span>
                       <a
                         v-if="ecole.numero_bce_du_po"
                         :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_du_po}&actionLu=Rechercher`"
                         target="_blank"
-                        class="hover:text-age hover:underline"
-                      >
-                        BCE PO <span class="font-mono select-all">{{ ecole.numero_bce_du_po }}</span>
-                      </a>
+                        class="font-mono select-all text-blue-600 hover:underline"
+                      >{{ ecole.numero_bce_du_po }} ↗</a>
                     </div>
-                  </div>
-
-                  <!-- Technical identifiers -->
-                  <div class="px-4 sm:px-6 py-3 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-500">
-                    <span v-if="ecole.ndeg_fase_de_l_etablissement">
-                      FASE etab. <span class="font-mono select-all">{{ ecole.ndeg_fase_de_l_etablissement }}</span>
-                    </span>
-                    <span v-if="ecole.ndeg_fase_de_l_implantation">
-                      FASE impl. <span class="font-mono select-all">{{ ecole.ndeg_fase_de_l_implantation }}</span>
-                    </span>
-                    <a
-                      v-if="ecole.numero_bce_de_l_etablissement"
-                      :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
-                      target="_blank"
-                      class="hover:text-age hover:underline"
-                    >
-                      BCE <span class="font-mono select-all">{{ ecole.numero_bce_de_l_etablissement }}</span>
-                    </a>
                   </div>
 
                   <!-- Action buttons -->
@@ -291,19 +321,16 @@
 
 <script>
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { BuildingOfficeIcon, MapIcon, MapPinIcon, ShareIcon } from '@heroicons/vue/24/outline';
-import { XMarkIcon } from '@heroicons/vue/24/outline';
+import { MapIcon, ShareIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 
 export default {
   /* eslint-disable vue/no-reserved-component-names */
   components: {
-    BuildingOfficeIcon,
     Dialog,
     DialogPanel,
     TransitionChild,
     TransitionRoot,
     MapIcon,
-    MapPinIcon,
     ShareIcon,
     XMarkIcon,
   },
@@ -315,7 +342,7 @@ export default {
       default: null,
     },
   },
-  emits: ['close'],
+  emits: ['close', 'filter'],
   data() {
     return {
       linkCopied: false,

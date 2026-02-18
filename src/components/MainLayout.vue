@@ -392,6 +392,7 @@ const mobileFiltersOpen = ref(false);
                       v-if="selected_ecole && selected_ecole.nom_d_etablissement"
                       :ecole="selected_ecole"
                       @close="closeEcole"
+                      @filter="applyFilterFromEcole"
                     />
                   </div>
                 </div>
@@ -483,6 +484,12 @@ export default {
     },
     closeEcole() {
       this.selected_ecole = null;
+      this.updateUrl();
+    },
+    applyFilterFromEcole(category, value) {
+      this.selected_ecole = null;
+      this.active_filters = { [category]: value };
+      this.applyFilters();
       this.updateUrl();
     },
     updateUrl() {
