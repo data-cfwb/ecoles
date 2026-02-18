@@ -89,6 +89,12 @@
                       <div v-if="ecole.code_postal_de_l_implantation || ecole.localite_de_l_implantation">
                         {{ ecole.code_postal_de_l_implantation }} {{ ecole.localite_de_l_implantation }}
                       </div>
+                      <div
+                        v-if="ecole.commune_de_l_implantation && ecole.commune_de_l_implantation !== ecole.localite_de_l_implantation"
+                        class="text-gray-500"
+                      >
+                        ({{ ecole.commune_de_l_implantation }})
+                      </div>
                     </div>
                   </div>
 
@@ -107,6 +113,12 @@
                       </div>
                       <div v-if="ecole.code_postal_de_l_etablissement || ecole.localite_de_l_etablissement">
                         {{ ecole.code_postal_de_l_etablissement }} {{ ecole.localite_de_l_etablissement }}
+                      </div>
+                      <div
+                        v-if="ecole.commune_de_l_etablissement && ecole.commune_de_l_etablissement !== ecole.localite_de_l_etablissement"
+                        class="text-gray-500"
+                      >
+                        ({{ ecole.commune_de_l_etablissement }})
                       </div>
                     </div>
                   </div>
@@ -189,6 +201,12 @@
                       <div>{{ ecole.adresse_du_po }}</div>
                       <div v-if="ecole.code_postal_du_po || ecole.localite_du_po">
                         {{ ecole.code_postal_du_po }} {{ ecole.localite_du_po }}
+                      </div>
+                      <div
+                        v-if="ecole.commune_du_po && ecole.commune_du_po !== ecole.localite_du_po"
+                        class="text-gray-500"
+                      >
+                        ({{ ecole.commune_du_po }})
                       </div>
                     </div>
                     <div
