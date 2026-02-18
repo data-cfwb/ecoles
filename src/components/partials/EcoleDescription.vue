@@ -73,13 +73,35 @@
                   </div>
                 </div>
                 <div class="border-t border-gray-200">
-                  <!-- Address -->
+                  <!-- Implantation Address -->
                   <div
-                    v-if="ecole.adresse_de_l_etablissement || ecole.code_postal_de_l_etablissement"
+                    v-if="ecole.adresse_de_l_implantation || ecole.code_postal_de_l_implantation"
                     class="px-4 py-4 sm:px-6 flex items-start gap-3"
                   >
                     <MapPinIcon class="h-5 w-5 text-gray-400 mt-0.5 shrink-0" />
                     <div class="text-sm text-gray-700">
+                      <div class="text-xs font-medium text-gray-500 uppercase mb-1">
+                        Adresse de l'implantation
+                      </div>
+                      <div v-if="ecole.adresse_de_l_implantation">
+                        {{ ecole.adresse_de_l_implantation }}
+                      </div>
+                      <div v-if="ecole.code_postal_de_l_implantation || ecole.localite_de_l_implantation">
+                        {{ ecole.code_postal_de_l_implantation }} {{ ecole.localite_de_l_implantation }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Etablissement Address (if different from implantation) -->
+                  <div
+                    v-if="(ecole.adresse_de_l_etablissement || ecole.code_postal_de_l_etablissement) && (ecole.adresse_de_l_etablissement !== ecole.adresse_de_l_implantation || ecole.code_postal_de_l_etablissement !== ecole.code_postal_de_l_implantation)"
+                    class="px-4 pb-4 sm:px-6 flex items-start gap-3"
+                  >
+                    <BuildingOfficeIcon class="h-5 w-5 text-gray-400 mt-0.5 shrink-0" />
+                    <div class="text-sm text-gray-700">
+                      <div class="text-xs font-medium text-gray-500 uppercase mb-1">
+                        Adresse de l'établissement
+                      </div>
                       <div v-if="ecole.adresse_de_l_etablissement">
                         {{ ecole.adresse_de_l_etablissement }}
                       </div>
@@ -147,16 +169,43 @@
                         {{ ecole.reseau }}
                       </dd>
                     </div>
+                  </div>
+
+                  <!-- Pouvoir Organisateur section -->
+                  <div
+                    v-if="ecole.nom_du_po"
+                    class="px-4 py-4 sm:px-6 border-t border-gray-100"
+                  >
+                    <div class="text-xs font-medium text-gray-500 uppercase mb-2">
+                      Pouvoir organisateur
+                    </div>
+                    <div class="text-sm text-gray-900 font-medium">
+                      {{ ecole.nom_du_po }}
+                    </div>
                     <div
-                      v-if="ecole.nom_du_po"
-                      class="col-span-2"
+                      v-if="ecole.adresse_du_po"
+                      class="mt-2 text-sm text-gray-700"
                     >
-                      <dt class="text-xs font-medium text-gray-500 uppercase">
-                        Pouvoir organisateur
-                      </dt>
-                      <dd class="mt-0.5 text-sm text-gray-900">
-                        {{ ecole.nom_du_po }}
-                      </dd>
+                      <div>{{ ecole.adresse_du_po }}</div>
+                      <div v-if="ecole.code_postal_du_po || ecole.localite_du_po">
+                        {{ ecole.code_postal_du_po }} {{ ecole.localite_du_po }}
+                      </div>
+                    </div>
+                    <div
+                      v-if="ecole.ndeg_fase_du_po || ecole.numero_bce_du_po"
+                      class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500"
+                    >
+                      <span v-if="ecole.ndeg_fase_du_po">
+                        FASE PO <span class="font-mono select-all">{{ ecole.ndeg_fase_du_po }}</span>
+                      </span>
+                      <a
+                        v-if="ecole.numero_bce_du_po"
+                        :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_du_po}&actionLu=Rechercher`"
+                        target="_blank"
+                        class="hover:text-age hover:underline"
+                      >
+                        BCE PO <span class="font-mono select-all">{{ ecole.numero_bce_du_po }}</span>
+                      </a>
                     </div>
                   </div>
 
@@ -224,12 +273,13 @@
 
 <script>
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { MapIcon, MapPinIcon, ShareIcon } from '@heroicons/vue/24/outline';
+import { BuildingOfficeIcon, MapIcon, MapPinIcon, ShareIcon } from '@heroicons/vue/24/outline';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 
 export default {
   /* eslint-disable vue/no-reserved-component-names */
   components: {
+    BuildingOfficeIcon,
     Dialog,
     DialogPanel,
     TransitionChild,
