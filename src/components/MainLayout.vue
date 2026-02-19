@@ -64,7 +64,7 @@ const mobileFiltersOpen = ref(false);
                 </div>
                 <div class="flex-1 overflow-y-auto">
                   <div class="pb-4 pt-4 px-4 text-sm font-bold">
-                    {{ isRandomView ? '10 écoles au hasard' : ecoles.length + ' écoles trouvées' }}
+                    {{ isRandomView ? ecoles.length + ' écoles (aléatoire)' : ecoles.length + ' écoles trouvées' }}
                   </div>
 
                   <!-- Search by name -->
@@ -197,7 +197,7 @@ const mobileFiltersOpen = ref(false);
           <div class="sticky top-0 z-30 -mx-4 px-4 py-3 bg-white/95 backdrop-blur-sm border-b border-gray-200 lg:hidden">
             <div class="flex items-center justify-between">
               <span class="text-sm font-medium text-gray-700">
-                {{ isRandomView ? '10 au hasard' : ecoles.length + ' écoles' }}
+                {{ isRandomView ? 'Aléatoire' : ecoles.length + ' écoles' }}
               </span>
               <div class="flex items-center gap-2">
                 <button
@@ -348,7 +348,7 @@ const mobileFiltersOpen = ref(false);
                   <div class="hidden lg:flex lg:items-center">
                     <div class="flex-auto">
                       <p class="text-sm text-gray-700">
-                        {{ isRandomView ? '10 écoles au hasard' : ecoles.length + ' écoles trouvées' }}
+                        {{ isRandomView ? ecoles.length + ' écoles (aléatoire)' : ecoles.length + ' écoles trouvées' }}
                       </p>
                     </div>
                     <div class="ml-16 flex-none">
@@ -389,7 +389,7 @@ const mobileFiltersOpen = ref(false);
                       @select-ecole="selectEcole"
                     />
                     <EcoleDescription
-                      v-if="selected_ecole && selected_ecole.nom_d_etablissement"
+                      v-if="selected_ecole && selected_ecole.nom"
                       :ecole="selected_ecole"
                       @close="closeEcole"
                       @filter="applyFilterFromEcole"
@@ -407,7 +407,6 @@ const mobileFiltersOpen = ref(false);
 </template>
 
 <script>
-import ecolesData from '@/data/ecoles.json';
 import MapComponent from '@/components/MapComponent.vue';
 import FooterModule from '@/components/partials/FooterModule.vue';
 import ListEcoles from '@/components/ListEcoles.vue';
@@ -433,7 +432,7 @@ export default {
       searchDebounceTimer: null,
       filters: [
         {
-          id: 'type_d_enseignement',
+          id: 'type',
           name: 'Type d\'enseignement',
           options: [],
           collapsed: true,
@@ -445,13 +444,13 @@ export default {
           collapsed: true,
         },
         {
-          id: 'arrondissement_administratif',
+          id: 'arr',
           name: 'Arrondissement',
           options: [],
           collapsed: true,
         },
         {
-          id: 'commune_de_l_etablissement',
+          id: 'commune_etab',
           name: 'Commune',
           options: [],
           collapsed: true,
@@ -495,8 +494,8 @@ export default {
     updateUrl() {
       const url = new URL(window.location);
       if (this.selected_ecole) {
-        url.searchParams.set('etablissement', this.selected_ecole.ndeg_fase_de_l_etablissement);
-        url.searchParams.set('implantation', this.selected_ecole.ndeg_fase_de_l_implantation);
+        url.searchParams.set('etablissement', this.selected_ecole.id_etab);
+        url.searchParams.set('implantation', this.selected_ecole.id_impl);
       } else {
         url.searchParams.delete('etablissement');
         url.searchParams.delete('implantation');
@@ -559,14 +558,14 @@ export default {
       if (this.search_text) {
         const searchLower = this.search_text.toLowerCase();
         filtered = filtered.filter(ecole =>
-          ecole.nom_d_etablissement && ecole.nom_d_etablissement.toLowerCase().includes(searchLower)
+          ecole.nom && ecole.nom.toLowerCase().includes(searchLower)
         );
       }
 
       // Apply postal code search
       if (this.search_postal) {
         filtered = filtered.filter(ecole =>
-          ecole.code_postal_de_l_etablissement && ecole.code_postal_de_l_etablissement.toString().includes(this.search_postal)
+          ecole.cp_etab && ecole.cp_etab.toString().includes(this.search_postal)
         );
       }
 
@@ -575,9 +574,9 @@ export default {
     },
     orderByCommune() {
       this.ecoles.sort((a, b) => {
-        if (!a.commune_de_l_etablissement) return 1;
-        if (!b.commune_de_l_etablissement) return -1;
-        return a.commune_de_l_etablissement.localeCompare(b.commune_de_l_etablissement);
+        if (!a.commune_etab) return 1;
+        if (!b.commune_etab) return -1;
+        return a.commune_etab.localeCompare(b.commune_etab);
       });
     },
     resetFilter() {
@@ -585,7 +584,7 @@ export default {
       this.search_text = '';
       this.search_postal = '';
       this.isRandomView = true;
-      this.ecoles = this.shuffleArray([...this.original_ecoles]).slice(0, 10);
+      this.ecoles = this.shuffleArray([...this.original_ecoles]);
     },
     shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -596,25 +595,26 @@ export default {
     },
     prepareProperties(ecoles) {
       ecoles.forEach(ecole => {
-        ecole.latLong = [parseFloat(ecole.latitude), parseFloat(ecole.longitude)];
-        ecole.fullAddress = `${ecole.adresse_de_l_etablissement || ''}, ${ecole.code_postal_de_l_etablissement || ''} ${ecole.localite_de_l_etablissement || ''}`.trim();
-        if (ecole.nom_d_etablissement) {
-          ecole.nom_d_etablissement = ecole.nom_d_etablissement.replace(/\n/g, ' ').trim();
+        ecole.latLong = [parseFloat(ecole.lat), parseFloat(ecole.lng)];
+        ecole.fullAddress = `${ecole.adr_etab || ''}, ${ecole.cp_etab || ''} ${ecole.loc_etab || ''}`.trim();
+        if (ecole.nom) {
+          ecole.nom = ecole.nom.replace(/\n/g, ' ').trim();
         }
-        if (ecole.commune_de_l_etablissement) {
-          ecole.commune_de_l_etablissement = ecole.commune_de_l_etablissement.replace(/\n/g, ' ').trim();
+        if (ecole.commune_etab) {
+          ecole.commune_etab = ecole.commune_etab.replace(/\n/g, ' ').trim();
         }
-        if (ecole.localite_de_l_etablissement) {
-          ecole.localite_de_l_etablissement = ecole.localite_de_l_etablissement.replace(/\n/g, ' ').trim();
+        if (ecole.loc_etab) {
+          ecole.loc_etab = ecole.loc_etab.replace(/\n/g, ' ').trim();
         }
       });
     },
-    getEcoles() {
+    async getEcoles() {
       this.data_loaded = false;
-      this.original_ecoles = ecolesData;
+      const response = await fetch('/data/ecoles.json');
+      this.original_ecoles = await response.json();
       this.prepareProperties(this.original_ecoles);
       this.defineFilters();
-      this.ecoles = this.shuffleArray([...this.original_ecoles]).slice(0, 10);
+      this.ecoles = this.shuffleArray([...this.original_ecoles]);
       this.data_loaded = true;
 
       // Deep linking: open school from URL params
@@ -623,7 +623,7 @@ export default {
       const impl = params.get('implantation');
       if (etab && impl) {
         const found = this.original_ecoles.find(e =>
-          e.ndeg_fase_de_l_etablissement == etab && e.ndeg_fase_de_l_implantation == impl
+          e.id_etab == etab && e.id_impl == impl
         );
         if (found) this.selected_ecole = found;
       }

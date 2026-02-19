@@ -57,8 +57,8 @@ export default {
     },
     selectedEcole: {
       handler(newVal) {
-        if (this.map && newVal && newVal.latitude && newVal.longitude) {
-          this.map.setView([newVal.latitude, newVal.longitude], 15);
+        if (this.map && newVal && newVal.lat && newVal.lng) {
+          this.map.setView([newVal.lat, newVal.lng], 15);
         }
       },
       deep: true,
@@ -102,8 +102,8 @@ export default {
       // Group schools by coordinates to handle overlaps
       const coordMap = {};
       this.ecoles.forEach(ecole => {
-        if (ecole.latitude && ecole.longitude) {
-          const key = `${ecole.latitude},${ecole.longitude}`;
+        if (ecole.lat && ecole.lng) {
+          const key = `${ecole.lat},${ecole.lng}`;
           if (!coordMap[key]) coordMap[key] = [];
           coordMap[key].push(ecole);
         }
@@ -112,8 +112,8 @@ export default {
       const offset = 0.00007; // ~7m spread for overlapping points
       Object.values(coordMap).forEach(group => {
         group.forEach((ecole, i) => {
-          let lat = parseFloat(ecole.latitude);
-          let lng = parseFloat(ecole.longitude);
+          let lat = parseFloat(ecole.lat);
+          let lng = parseFloat(ecole.lng);
 
           if (group.length > 1) {
             const angle = (2 * Math.PI * i) / group.length;
@@ -121,7 +121,7 @@ export default {
             lng += offset * Math.sin(angle);
           }
 
-          const color = getMarkerColor(ecole.type_d_enseignement);
+          const color = getMarkerColor(ecole.type);
           const latlng = [lat, lng];
           bounds.extend(latlng);
 
@@ -136,9 +136,9 @@ export default {
 
           const tooltipContent = `
             <div class="font-sans">
-              <div class="font-bold text-blue-900">${ecole.nom_d_etablissement || 'École'}</div>
-              <div class="text-sm">${ecole.type_d_enseignement || ''}</div>
-              <div class="text-sm text-gray-600">${ecole.commune_de_l_etablissement || ''}</div>
+              <div class="font-bold text-blue-900">${ecole.nom || 'École'}</div>
+              <div class="text-sm">${ecole.type || ''}</div>
+              <div class="text-sm text-gray-600">${ecole.commune_etab || ''}</div>
             </div>
           `;
 

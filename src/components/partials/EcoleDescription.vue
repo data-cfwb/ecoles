@@ -41,15 +41,15 @@
                   <div class="flex items-start justify-between">
                     <div class="flex-1">
                       <h3 class="text-xl font-bold leading-7 text-gray-900">
-                        {{ ecole.nom_d_etablissement || 'École' }}
+                        {{ ecole.nom || 'École' }}
                       </h3>
                       <div class="mt-2 flex items-center gap-2">
                         <span
-                          v-if="ecole.type_d_enseignement"
+                          v-if="ecole.type"
                           class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
-                          :class="getEducationTypeClass(ecole.type_d_enseignement)"
+                          :class="getEducationTypeClass(ecole.type)"
                         >
-                          {{ ecole.type_d_enseignement }}
+                          {{ ecole.type }}
                         </span>
                         <span
                           v-if="ecole.niveau"
@@ -75,100 +75,100 @@
                 <div class="border-t border-gray-200">
                   <!-- Implantation Address + Technical identifiers -->
                   <div
-                    v-if="ecole.adresse_de_l_implantation || ecole.code_postal_de_l_implantation"
+                    v-if="ecole.adr_impl || ecole.cp_impl"
                     class="px-4 py-4 sm:px-6 flex items-start justify-between gap-6"
                   >
                     <div class="text-sm text-gray-700">
                       <div class="text-xs font-medium text-gray-500 uppercase mb-1">
                         Adresse de l'implantation
                       </div>
-                      <div v-if="ecole.adresse_de_l_implantation">
-                        {{ ecole.adresse_de_l_implantation }}
+                      <div v-if="ecole.adr_impl">
+                        {{ ecole.adr_impl }}
                       </div>
-                      <div v-if="ecole.code_postal_de_l_implantation || ecole.localite_de_l_implantation">
-                        {{ ecole.code_postal_de_l_implantation }} {{ ecole.localite_de_l_implantation }}
+                      <div v-if="ecole.cp_impl || ecole.loc_impl">
+                        {{ ecole.cp_impl }} {{ ecole.loc_impl }}
                       </div>
                       <div
-                        v-if="ecole.commune_de_l_implantation && ecole.commune_de_l_implantation !== ecole.localite_de_l_implantation"
+                        v-if="ecole.commune_impl && ecole.commune_impl !== ecole.loc_impl"
                         class="text-gray-500"
                       >
-                        ({{ ecole.commune_de_l_implantation }})
+                        ({{ ecole.commune_impl }})
                       </div>
                     </div>
                     <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs shrink-0">
                       <span
-                        v-if="ecole.ndeg_fase_de_l_etablissement"
+                        v-if="ecole.id_etab"
                         class="text-gray-400"
                       >FASE étab.</span>
                       <span
-                        v-if="ecole.ndeg_fase_de_l_etablissement"
+                        v-if="ecole.id_etab"
                         class="font-mono select-all text-gray-500"
-                      >{{ ecole.ndeg_fase_de_l_etablissement }}</span>
+                      >{{ ecole.id_etab }}</span>
                       <span
-                        v-if="ecole.ndeg_fase_de_l_implantation"
+                        v-if="ecole.id_impl"
                         class="text-gray-400"
                       >FASE impl.</span>
                       <span
-                        v-if="ecole.ndeg_fase_de_l_implantation"
+                        v-if="ecole.id_impl"
                         class="font-mono select-all text-gray-500"
-                      >{{ ecole.ndeg_fase_de_l_implantation }}</span>
+                      >{{ ecole.id_impl }}</span>
                       <span
-                        v-if="ecole.numero_bce_de_l_etablissement"
+                        v-if="ecole.bce_etab"
                         class="text-gray-400"
                       >BCE</span>
                       <a
-                        v-if="ecole.numero_bce_de_l_etablissement"
-                        :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_de_l_etablissement}&actionLu=Rechercher`"
+                        v-if="ecole.bce_etab"
+                        :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.bce_etab}&actionLu=Rechercher`"
                         target="_blank"
                         class="font-mono select-all text-blue-600 hover:underline"
-                      >{{ ecole.numero_bce_de_l_etablissement }} ↗</a>
+                      >{{ ecole.bce_etab }} ↗</a>
                     </div>
                   </div>
 
                   <!-- Etablissement Address (if different from implantation) -->
                   <div
-                    v-if="(ecole.adresse_de_l_etablissement || ecole.code_postal_de_l_etablissement) && (ecole.adresse_de_l_etablissement !== ecole.adresse_de_l_implantation || ecole.code_postal_de_l_etablissement !== ecole.code_postal_de_l_implantation)"
+                    v-if="(ecole.adr_etab || ecole.cp_etab) && (ecole.adr_etab !== ecole.adr_impl || ecole.cp_etab !== ecole.cp_impl)"
                     class="px-4 pb-4 sm:px-6"
                   >
                     <div class="text-sm text-gray-700">
                       <div class="text-xs font-medium text-gray-500 uppercase mb-1">
                         Adresse de l'établissement
                       </div>
-                      <div v-if="ecole.adresse_de_l_etablissement">
-                        {{ ecole.adresse_de_l_etablissement }}
+                      <div v-if="ecole.adr_etab">
+                        {{ ecole.adr_etab }}
                       </div>
-                      <div v-if="ecole.code_postal_de_l_etablissement || ecole.localite_de_l_etablissement">
-                        {{ ecole.code_postal_de_l_etablissement }} {{ ecole.localite_de_l_etablissement }}
+                      <div v-if="ecole.cp_etab || ecole.loc_etab">
+                        {{ ecole.cp_etab }} {{ ecole.loc_etab }}
                       </div>
                       <div
-                        v-if="ecole.commune_de_l_etablissement && ecole.commune_de_l_etablissement !== ecole.localite_de_l_etablissement"
+                        v-if="ecole.commune_etab && ecole.commune_etab !== ecole.loc_etab"
                         class="text-gray-500"
                       >
-                        ({{ ecole.commune_de_l_etablissement }})
+                        ({{ ecole.commune_etab }})
                       </div>
                     </div>
                   </div>
 
                   <!-- Info grid -->
                   <div class="px-4 sm:px-6 pb-4 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
-                    <div v-if="ecole.commune_de_l_etablissement">
+                    <div v-if="ecole.commune_etab">
                       <dt class="text-xs font-medium text-gray-500 uppercase">
                         Commune
                       </dt>
                       <dd class="mt-0.5 text-sm text-gray-900">
-                        {{ ecole.commune_de_l_etablissement }}
+                        {{ ecole.commune_etab }}
                       </dd>
                     </div>
-                    <div v-if="ecole.arrondissement_administratif">
+                    <div v-if="ecole.arr">
                       <dt class="text-xs font-medium text-gray-500 uppercase">
                         Arrondissement
                       </dt>
                       <dd class="mt-0.5 text-sm">
                         <button
                           class="text-gray-900 hover:text-age hover:underline text-left"
-                          @click="$emit('filter', 'arrondissement_administratif', ecole.arrondissement_administratif)"
+                          @click="$emit('filter', 'arr', ecole.arr)"
                         >
-                          {{ ecole.arrondissement_administratif }}
+                          {{ ecole.arr }}
                         </button>
                       </dd>
                     </div>
@@ -180,16 +180,16 @@
                         {{ ecole.bassin }}
                       </dd>
                     </div>
-                    <div v-if="ecole.type_d_enseignement">
+                    <div v-if="ecole.type">
                       <dt class="text-xs font-medium text-gray-500 uppercase">
                         Type
                       </dt>
                       <dd class="mt-0.5 text-sm">
                         <button
                           class="text-gray-900 hover:text-age hover:underline text-left"
-                          @click="$emit('filter', 'type_d_enseignement', ecole.type_d_enseignement)"
+                          @click="$emit('filter', 'type', ecole.type)"
                         >
-                          {{ ecole.type_d_enseignement }}
+                          {{ ecole.type }}
                         </button>
                       </dd>
                     </div>
@@ -226,62 +226,62 @@
 
                   <!-- Pouvoir Organisateur section -->
                   <div
-                    v-if="ecole.nom_du_po"
+                    v-if="ecole.nom_po"
                     class="px-4 py-4 sm:px-6 border-t border-gray-100"
                   >
                     <div class="text-xs font-medium text-gray-500 uppercase mb-2">
                       Pouvoir organisateur
                     </div>
                     <div class="text-sm text-gray-900 font-medium">
-                      {{ ecole.nom_du_po }}
+                      {{ ecole.nom_po }}
                     </div>
                     <div
-                      v-if="ecole.adresse_du_po"
+                      v-if="ecole.adr_po"
                       class="mt-2 text-sm text-gray-700"
                     >
-                      <div>{{ ecole.adresse_du_po }}</div>
-                      <div v-if="ecole.code_postal_du_po || ecole.localite_du_po">
-                        {{ ecole.code_postal_du_po }} {{ ecole.localite_du_po }}
+                      <div>{{ ecole.adr_po }}</div>
+                      <div v-if="ecole.cp_po || ecole.loc_po">
+                        {{ ecole.cp_po }} {{ ecole.loc_po }}
                       </div>
                       <div
-                        v-if="ecole.commune_du_po && ecole.commune_du_po !== ecole.localite_du_po"
+                        v-if="ecole.commune_po && ecole.commune_po !== ecole.loc_po"
                         class="text-gray-500"
                       >
-                        ({{ ecole.commune_du_po }})
+                        ({{ ecole.commune_po }})
                       </div>
                     </div>
                     <div
-                      v-if="ecole.ndeg_fase_du_po || ecole.numero_bce_du_po"
+                      v-if="ecole.id_po || ecole.bce_po"
                       class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-xs max-w-xs"
                     >
                       <span
-                        v-if="ecole.ndeg_fase_du_po"
+                        v-if="ecole.id_po"
                         class="text-gray-500"
                       >FASE</span>
                       <span
-                        v-if="ecole.ndeg_fase_du_po"
+                        v-if="ecole.id_po"
                         class="font-mono select-all text-gray-700"
-                      >{{ ecole.ndeg_fase_du_po }}</span>
+                      >{{ ecole.id_po }}</span>
                       <span
-                        v-if="ecole.numero_bce_du_po"
+                        v-if="ecole.bce_po"
                         class="text-gray-500"
                       >BCE</span>
                       <a
-                        v-if="ecole.numero_bce_du_po"
-                        :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.numero_bce_du_po}&actionLu=Rechercher`"
+                        v-if="ecole.bce_po"
+                        :href="`https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=${ecole.bce_po}&actionLu=Rechercher`"
                         target="_blank"
                         class="font-mono select-all text-blue-600 hover:underline"
-                      >{{ ecole.numero_bce_du_po }} ↗</a>
+                      >{{ ecole.bce_po }} ↗</a>
                     </div>
                   </div>
 
                   <!-- Action buttons -->
                   <div class="px-4 py-4 sm:px-6 bg-gray-50 flex gap-3">
                     <a
-                      v-if="ecole.latitude && ecole.longitude"
+                      v-if="ecole.lat && ecole.lng"
                       type="button"
                       class="inline-flex items-center rounded-md bg-age px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-                      :href="`https://www.google.be/maps/dir/?api=1&destination=${ecole.latitude},${ecole.longitude}`"
+                      :href="`https://www.google.be/maps/dir/?api=1&destination=${ecole.lat},${ecole.lng}`"
                       target="_blank"
                     >
                       <MapIcon
@@ -351,8 +351,8 @@ export default {
   methods: {
     shareLink() {
       const url = new URL(window.location);
-      url.searchParams.set('etablissement', this.ecole.ndeg_fase_de_l_etablissement);
-      url.searchParams.set('implantation', this.ecole.ndeg_fase_de_l_implantation);
+      url.searchParams.set('etablissement', this.ecole.id_etab);
+      url.searchParams.set('implantation', this.ecole.id_impl);
       navigator.clipboard.writeText(url.toString());
       this.linkCopied = true;
       setTimeout(() => { this.linkCopied = false; }, 2000);

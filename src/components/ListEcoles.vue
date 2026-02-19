@@ -9,16 +9,16 @@
       >
         <div class="flex-1">
           <p class="text-lg font-bold leading-6 text-gray-900">
-            {{ ecole.nom_d_etablissement || 'École' }}
+            {{ ecole.nom || 'École' }}
           </p>
 
           <div class="mt-2 flex items-center gap-2">
             <span
-              v-if="ecole.type_d_enseignement"
+              v-if="ecole.type"
               class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
-              :class="getEducationTypeClass(ecole.type_d_enseignement)"
+              :class="getEducationTypeClass(ecole.type)"
             >
-              {{ ecole.type_d_enseignement }}
+              {{ ecole.type }}
             </span>
             <span
               v-if="ecole.niveau"
@@ -30,8 +30,8 @@
 
           <p class="mt-2 text-sm text-gray-600">
             <span class="font-medium">Adresse:</span><br>
-            {{ ecole.adresse_de_l_etablissement || 'Non renseigné' }}<br>
-            {{ ecole.code_postal_de_l_etablissement }} {{ ecole.localite_de_l_etablissement }}
+            {{ ecole.adr_etab || 'Non renseigné' }}<br>
+            {{ ecole.cp_etab }} {{ ecole.loc_etab }}
           </p>
 
           <p
@@ -42,10 +42,10 @@
           </p>
 
           <p
-            v-if="ecole.commune_de_l_etablissement"
+            v-if="ecole.commune_etab"
             class="mt-1 text-sm text-gray-500"
           >
-            <span class="font-medium">Commune:</span> {{ ecole.commune_de_l_etablissement }}
+            <span class="font-medium">Commune:</span> {{ ecole.commune_etab }}
           </p>
         </div>
 

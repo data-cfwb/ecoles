@@ -18,10 +18,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Fetch school data
+      - name: Fetch and transform school data
         run: |
           python3 -c "
-          import urllib.request, json
+          import urllib.request, json, os
 
           base_url = 'https://www.odwb.be/api/explore/v2.1/catalog/datasets/fwb-age-fichier-signaletique-des-etablissements-d-enseignement-de-la-federation-/records'
           limit = 100
@@ -42,8 +42,54 @@ jobs:
 
           print(f'Total: {len(all_records)} records')
 
-          with open('src/data/ecoles.json', 'w', encoding='utf-8') as f:
-              json.dump(all_records, f, ensure_ascii=False)
+          KEY_MAP = {
+              'ndeg_fase_de_l_etablissement': 'id_etab',
+              'nom_d_etablissement': 'nom',
+              'numero_bce_de_l_etablissement': 'bce_etab',
+              'type_d_enseignement': 'type',
+              'niveau': 'niveau',
+              'genre': 'genre',
+              'reseau': 'reseau',
+              'adresse_de_l_etablissement': 'adr_etab',
+              'code_postal_de_l_etablissement': 'cp_etab',
+              'localite_de_l_etablissement': 'loc_etab',
+              'commune_de_l_etablissement': 'commune_etab',
+              'bassin': 'bassin',
+              'arrondissement_administratif': 'arr',
+              'ndeg_fase_de_l_implantation': 'id_impl',
+              'adresse_de_l_implantation': 'adr_impl',
+              'code_postal_de_l_implantation': 'cp_impl',
+              'localite_de_l_implantation': 'loc_impl',
+              'commune_de_l_implantation': 'commune_impl',
+              'latitude': 'lat',
+              'longitude': 'lng',
+              'ndeg_fase_du_po': 'id_po',
+              'nom_du_po': 'nom_po',
+              'numero_bce_du_po': 'bce_po',
+              'adresse_du_po': 'adr_po',
+              'code_postal_du_po': 'cp_po',
+              'localite_du_po': 'loc_po',
+              'commune_du_po': 'commune_po',
+          }
+          INT_FIELDS = {'ndeg_fase_de_l_etablissement', 'ndeg_fase_de_l_implantation', 'ndeg_fase_du_po'}
+          COORD_FIELDS = {'latitude', 'longitude'}
+
+          slim = []
+          for record in all_records:
+              r = {}
+              for old_key, new_key in KEY_MAP.items():
+                  val = record.get(old_key)
+                  if val is not None:
+                      if old_key in INT_FIELDS:
+                          val = int(val)
+                      elif old_key in COORD_FIELDS:
+                          val = round(float(val), 5)
+                  r[new_key] = val
+              slim.append(r)
+
+          os.makedirs('public/data', exist_ok=True)
+          with open('public/data/ecoles.json', 'w', encoding='utf-8') as f:
+              json.dump(slim, f, ensure_ascii=False, separators=(',', ':'))
 
           from datetime import date
           with open('src/data/metadata.json', 'w', encoding='utf-8') as f:
@@ -73,5 +119,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/data/ecoles.json src/data/metadata.json public/sitemap.xml
+          git add public/data/ecoles.json src/data/metadata.json public/sitemap.xml
           git diff --staged --quiet || git commit -m "chore: update school data" && git push
